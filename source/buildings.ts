@@ -65,6 +65,11 @@ export class BuildingManager {
       return false
     }
 
+    // Skip road connection check if the building is a road
+    if (building.id !== 'ROAD' && !this.hasValidRoadConnection(building, position, rotation)) {
+      return false
+    }
+
     const placedBuilding: PlacedBuilding = {
       ...building,
       position,
@@ -110,6 +115,50 @@ export class BuildingManager {
       return { width: size.height, height: size.width }
     }
     return { ...size }
+  }
+
+  private getRotatedConnections(connections: number[], rotation: number): number[] {
+    const shifts = rotation / 90;
+    return [...connections.slice(shifts), ...connections.slice(0, shifts)];
+  }
+
+  private hasValidRoadConnection(building: Building, position: Position, rotation: number): boolean {
+    const rotatedConnections = this.getRotatedConnections(building.connections, rotation);
+    
+    // Check each side where connections are allowed
+    // Top side
+    if (rotatedConnections[0] > 0) {
+      for (let x = position.x; x < position.x + building.size.width; x++) {
+        const adjacentBuilding = this.getBuildingAt({ x, y: position.y - 1 });
+        if (adjacentBuilding?.id === 'ROAD') return true;
+      }
+    }
+    
+    // Right side
+    if (rotatedConnections[1] > 0) {
+      for (let y = position.y; y < position.y + building.size.height; y++) {
+        const adjacentBuilding = this.getBuildingAt({ x: position.x + building.size.width, y });
+        if (adjacentBuilding?.id === 'ROAD') return true;
+      }
+    }
+    
+    // Bottom side
+    if (rotatedConnections[2] > 0) {
+      for (let x = position.x; x < position.x + building.size.width; x++) {
+        const adjacentBuilding = this.getBuildingAt({ x, y: position.y + building.size.height });
+        if (adjacentBuilding?.id === 'ROAD') return true;
+      }
+    }
+    
+    // Left side
+    if (rotatedConnections[3] > 0) {
+      for (let y = position.y; y < position.y + building.size.height; y++) {
+        const adjacentBuilding = this.getBuildingAt({ x: position.x - 1, y });
+        if (adjacentBuilding?.id === 'ROAD') return true;
+      }
+    }
+    
+    return false;
   }
 
   private getResourceInputRatio(building: PlacedBuilding): number {
