@@ -29,13 +29,14 @@
         "useImportExtensions": "error"
       },
       "performance": {
-        "noBarrelFile": "error"
+        "noBarrelFile": "off"
       },
       "style": {
         "noDefaultExport": "error",
         "noNamespace": "error",
         "noNamespaceImport": "error",
         "noNegationElse": "error",
+        "noNonNullAssertion": "off",
         "noParameterProperties": "error",
         "noShoutyConstants": "error",
         "noYodaExpression": "error",

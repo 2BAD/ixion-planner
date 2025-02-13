@@ -16,10 +16,8 @@ export type Cell = {
 }
 
 export enum CellType {
-  // biome-ignore lint/style/useNamingConvention:
-  NORMAL = 'NORMAL',
-  // biome-ignore lint/style/useNamingConvention:
-  LIMITED = 'LIMITED'
+  Normal = 'NORMAL',
+  Limited = 'LIMITED'
 }
 
 export class Grid {
@@ -42,7 +40,7 @@ export class Grid {
           .map((_, x) => ({
             position: { x, y },
             occupied: false,
-            type: CellType.NORMAL
+            type: CellType.Normal
           }))
       )
   }
@@ -58,7 +56,7 @@ export class Grid {
           !this.isWithinBounds({ x, y }) ||
           this.cells[y]![x]!.occupied ||
           // TODO: Handle limited hight cells
-          this.cells[y]![x]!.type === CellType.LIMITED
+          this.cells[y]![x]!.type === CellType.Limited
         ) {
           return false
         }
