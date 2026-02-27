@@ -45,6 +45,10 @@ export class Grid {
       )
   }
 
+  private cellAt(x: number, y: number): Cell {
+    return (this.cells[y] as Cell[])[x] as Cell
+  }
+
   public isWithinBounds(position: Position): boolean {
     return position.x >= 0 && position.x < this.width && position.y >= 0 && position.y < this.height
   }
@@ -54,9 +58,9 @@ export class Grid {
       for (let x = position.x; x < position.x + size.width; x++) {
         if (
           !this.isWithinBounds({ x, y }) ||
-          this.cells[y]![x]!.occupied ||
+          this.cellAt(x, y).occupied ||
           // TODO: Handle limited hight cells
-          this.cells[y]![x]!.type === CellType.Limited
+          this.cellAt(x, y).type === CellType.Limited
         ) {
           return false
         }
@@ -72,8 +76,8 @@ export class Grid {
 
     for (let y = position.y; y < position.y + size.height; y++) {
       for (let x = position.x; x < position.x + size.width; x++) {
-        this.cells[y]![x]!.occupied = true
-        this.cells[y]![x]!.buildingId = buildingId
+        this.cellAt(x, y).occupied = true
+        this.cellAt(x, y).buildingId = buildingId
       }
     }
     return true
@@ -82,9 +86,9 @@ export class Grid {
   public removeBuilding(buildingId: string): void {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        if (this.cells[y]![x]!.buildingId === buildingId) {
-          this.cells[y]![x]!.occupied = false
-          this.cells[y]![x]!.buildingId = undefined
+        if (this.cellAt(x, y).buildingId === buildingId) {
+          this.cellAt(x, y).occupied = false
+          this.cellAt(x, y).buildingId = undefined
         }
       }
     }
@@ -106,7 +110,7 @@ export class Grid {
       }
 
       if (this.isWithinBounds(neighborPosition)) {
-        neighbors.push(this.cells[neighborPosition.y]![neighborPosition.x]!)
+        neighbors.push(this.cellAt(neighborPosition.x, neighborPosition.y))
       }
     }
 
@@ -117,14 +121,14 @@ export class Grid {
     if (!this.isWithinBounds(position)) {
       return null
     }
-    return this.cells[position.y]![position.x]!
+    return this.cellAt(position.x, position.y)
   }
 
   public setCellType(position: Position, type: CellType): boolean {
     if (!this.isWithinBounds(position)) {
       return false
     }
-    this.cells[position.y]![position.x]!.type = type
+    this.cellAt(position.x, position.y).type = type
     return true
   }
 

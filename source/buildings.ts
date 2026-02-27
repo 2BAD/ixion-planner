@@ -112,7 +112,7 @@ export class BuildingManager {
     return { ...size }
   }
 
-  private getResourceInputRatio(building: PlacedBuilding): number {
+  private getResourceInputRatio(_building: PlacedBuilding): number {
     // TODO: Implement resource availability check
     return 1.0
   }
