@@ -25,25 +25,37 @@
     }
   ],
   "type": "module",
-  "exports": "./build/index.js",
-  "types": "./build/index.d.ts",
+  "exports": {
+    "./grid": {
+      "import": {
+        "types": "./build/grid.d.ts",
+        "default": "./build/grid.js"
+      }
+    },
+    "./buildings": {
+      "import": {
+        "types": "./build/buildings.d.ts",
+        "default": "./build/buildings.js"
+      }
+    },
+    "./templates/*": {
+      "import": {
+        "types": "./build/templates/*.d.ts",
+        "default": "./build/templates/*.js"
+      }
+    }
+  },
   "files": [
     "build"
   ],
   "scripts": {
-    "prebuild": "rimraf build",
-    "build": "run-p build:*",
-    "postbuild": "run-s fix:alias fix:ext",
-    "build:swc": "swc ./source -d ./build --strip-leading-paths",
-    "build:types": "tsc --project tsconfig.build.json",
-    "check": "run-p check:*",
-    "check:eslint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "check:biome": "biome check ./source",
-    "fix": "run-s fix:code fix:format",
-    "fix:alias": "tsc-alias -p tsconfig.build.json",
-    "fix:code": "run-s 'check:eslint -- --fix'",
-    "fix:ext": "tsfix",
-    "fix:format": "biome format --write ./source",
+    "build": "tsdown",
+    "check": "run-p check:**",
+    "check:code": "oxlint ./source",
+    "check:format": "oxfmt --check ./source",
+    "fix": "run-p fix:**",
+    "fix:code": "oxlint --fix ./source",
+    "fix:format": "oxfmt ./source",
     "prepublishOnly": "run-s build",
     "preversion": "run-s check test build",
     "test": "vitest run",
@@ -51,27 +63,30 @@
     "test:unit": "vitest run unit --coverage"
   },
   "devDependencies": {
-    "@2bad/axiom": "1.0.0-beta.12",
-    "@2bad/tsconfig": "3.0.1",
-    "@2bad/tsfix": "0.1.0",
-    "@biomejs/biome": "1.9.4",
-    "@swc/cli": "0.6.0",
-    "@swc/core": "1.10.16",
-    "@types/node": "22.13.2",
-    "@vitest/coverage-v8": "3.0.5",
-    "npm-run-all2": "7.0.2",
-    "rimraf": "6.0.1",
-    "tsc-alias": "1.8.10",
-    "typescript": "5.7.3",
-    "vite-tsconfig-paths": "5.1.4",
-    "vitest": "3.0.5"
+    "@2bad/tsconfig": "3.0.2",
+    "@arethetypeswrong/cli": "0.18.2",
+    "@types/node": "25.3.2",
+    "@vitest/coverage-v8": "4.0.18",
+    "npm-run-all2": "8.0.4",
+    "oxfmt": "0.35.0",
+    "oxlint": "1.50.0",
+    "publint": "0.3.17",
+    "tsdown": "0.20.3",
+    "typescript": "5.9.3",
+    "vite-tsconfig-paths": "6.1.1",
+    "vitest": "4.0.18"
   },
-  "packageManager": "npm@11.1.0",
+  "packageManager": "pnpm@10.30.1",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "volta": {
-    "node": "22.13.1",
-    "npm": "11.1.0"
+    "node": "24.13.1",
+    "pnpm": "10.30.1"
   }
 }
