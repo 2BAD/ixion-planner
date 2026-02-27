@@ -26,22 +26,28 @@
   ],
   "type": "module",
   "exports": {
+    "./types": {
+      "import": {
+        "types": "./build/types.d.ts",
+        "default": "./build/types.js"
+      }
+    },
     "./grid": {
       "import": {
         "types": "./build/grid.d.ts",
         "default": "./build/grid.js"
       }
     },
-    "./buildings": {
+    "./objective": {
       "import": {
-        "types": "./build/buildings.d.ts",
-        "default": "./build/buildings.js"
+        "types": "./build/objective.d.ts",
+        "default": "./build/objective.js"
       }
     },
-    "./templates/*": {
+    "./sa": {
       "import": {
-        "types": "./build/templates/*.d.ts",
-        "default": "./build/templates/*.js"
+        "types": "./build/sa.d.ts",
+        "default": "./build/sa.js"
       }
     }
   },

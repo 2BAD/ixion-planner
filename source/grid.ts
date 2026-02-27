@@ -1,156 +1,103 @@
-export type Position = {
-  x: number
-  y: number
+import type { BuildingTemplate, Layout, Position, Size } from '~/types.ts'
+
+export const createOccupancyGrid = (width: number, height: number): Uint8Array => {
+  return new Uint8Array(width * height)
 }
 
-export type Size = {
-  width: number
-  height: number
+export const isWithinBounds = (position: Position, size: Size, gridWidth: number, gridHeight: number): boolean => {
+  return (
+    position.x >= 0 && position.y >= 0 && position.x + size.width <= gridWidth && position.y + size.height <= gridHeight
+  )
 }
 
-export type Cell = {
-  type: CellType
-  position: Position
-  occupied: boolean
-  buildingId?: string | undefined
+export const markBuilding = (
+  grid: Uint8Array,
+  gridWidth: number,
+  position: Position,
+  size: Size,
+  marker: number
+): void => {
+  for (let dy = 0; dy < size.height; dy++) {
+    for (let dx = 0; dx < size.width; dx++) {
+      grid[(position.y + dy) * gridWidth + (position.x + dx)] = marker
+    }
+  }
 }
 
-export enum CellType {
-  Normal = 'NORMAL',
-  Limited = 'LIMITED'
+export const clearBuilding = (grid: Uint8Array, gridWidth: number, position: Position, size: Size): void => {
+  for (let dy = 0; dy < size.height; dy++) {
+    for (let dx = 0; dx < size.width; dx++) {
+      grid[(position.y + dy) * gridWidth + (position.x + dx)] = 0
+    }
+  }
 }
 
-export class Grid {
-  private cells: Cell[][]
-  private readonly width: number
-  private readonly height: number
-
-  constructor(width: number, height: number) {
-    this.width = width
-    this.height = height
-    this.cells = this.initializeGrid()
-  }
-
-  private initializeGrid(): Cell[][] {
-    return Array(this.height)
-      .fill(null)
-      .map((_, y) =>
-        Array(this.width)
-          .fill(null)
-          .map((_, x) => ({
-            position: { x, y },
-            occupied: false,
-            type: CellType.Normal
-          }))
-      )
-  }
-
-  private cellAt(x: number, y: number): Cell {
-    return (this.cells[y] as Cell[])[x] as Cell
-  }
-
-  public isWithinBounds(position: Position): boolean {
-    return position.x >= 0 && position.x < this.width && position.y >= 0 && position.y < this.height
-  }
-
-  public isAreaFree(position: Position, size: Size): boolean {
-    for (let y = position.y; y < position.y + size.height; y++) {
-      for (let x = position.x; x < position.x + size.width; x++) {
-        if (
-          !this.isWithinBounds({ x, y }) ||
-          this.cellAt(x, y).occupied ||
-          // TODO: Handle limited hight cells
-          this.cellAt(x, y).type === CellType.Limited
-        ) {
-          return false
-        }
+export const isAreaFree = (grid: Uint8Array, gridWidth: number, position: Position, size: Size): boolean => {
+  for (let dy = 0; dy < size.height; dy++) {
+    for (let dx = 0; dx < size.width; dx++) {
+      if (grid[(position.y + dy) * gridWidth + (position.x + dx)] !== 0) {
+        return false
       }
     }
-    return true
   }
+  return true
+}
 
-  public placeBuilding(position: Position, size: Size, buildingId: string): boolean {
-    if (!this.isAreaFree(position, size)) {
+export const isAreaFreeExcluding = (
+  grid: Uint8Array,
+  gridWidth: number,
+  position: Position,
+  size: Size,
+  excludeMarker: number
+): boolean => {
+  for (let dy = 0; dy < size.height; dy++) {
+    for (let dx = 0; dx < size.width; dx++) {
+      const cell = grid[(position.y + dy) * gridWidth + (position.x + dx)]
+      if (cell !== 0 && cell !== excludeMarker) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
+export const buildOccupancyGrid = (
+  gridWidth: number,
+  gridHeight: number,
+  placements: Layout['placements'],
+  buildings: BuildingTemplate[]
+): Uint8Array => {
+  const grid = createOccupancyGrid(gridWidth, gridHeight)
+  for (let i = 0; i < placements.length; i++) {
+    const placement = placements[i]
+    const building = buildings[placement.templateIndex]
+    markBuilding(grid, gridWidth, placement.position, building.size, i + 1)
+  }
+  return grid
+}
+
+export const validateLayout = (
+  gridWidth: number,
+  gridHeight: number,
+  placements: Layout['placements'],
+  buildings: BuildingTemplate[]
+): boolean => {
+  const grid = createOccupancyGrid(gridWidth, gridHeight)
+
+  for (let i = 0; i < placements.length; i++) {
+    const placement = placements[i]
+    const building = buildings[placement.templateIndex]
+
+    if (!isWithinBounds(placement.position, building.size, gridWidth, gridHeight)) {
       return false
     }
 
-    for (let y = position.y; y < position.y + size.height; y++) {
-      for (let x = position.x; x < position.x + size.width; x++) {
-        this.cellAt(x, y).occupied = true
-        this.cellAt(x, y).buildingId = buildingId
-      }
-    }
-    return true
-  }
-
-  public removeBuilding(buildingId: string): void {
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        if (this.cellAt(x, y).buildingId === buildingId) {
-          this.cellAt(x, y).occupied = false
-          this.cellAt(x, y).buildingId = undefined
-        }
-      }
-    }
-  }
-
-  public getNeighbors(position: Position): Cell[] {
-    const neighbors: Cell[] = []
-    const directions = [
-      { x: -1, y: 0 },
-      { x: 1, y: 0 },
-      { x: 0, y: -1 },
-      { x: 0, y: 1 }
-    ]
-
-    for (const dir of directions) {
-      const neighborPosition = {
-        x: position.x + dir.x,
-        y: position.y + dir.y
-      }
-
-      if (this.isWithinBounds(neighborPosition)) {
-        neighbors.push(this.cellAt(neighborPosition.x, neighborPosition.y))
-      }
-    }
-
-    return neighbors
-  }
-
-  public getCell(position: Position): Cell | null {
-    if (!this.isWithinBounds(position)) {
-      return null
-    }
-    return this.cellAt(position.x, position.y)
-  }
-
-  public setCellType(position: Position, type: CellType): boolean {
-    if (!this.isWithinBounds(position)) {
+    if (!isAreaFree(grid, gridWidth, placement.position, building.size)) {
       return false
     }
-    this.cellAt(position.x, position.y).type = type
-    return true
+
+    markBuilding(grid, gridWidth, placement.position, building.size, i + 1)
   }
 
-  public getDimensions(): Size {
-    return {
-      width: this.width,
-      height: this.height
-    }
-  }
-
-  public serialize(): string {
-    return JSON.stringify({
-      width: this.width,
-      height: this.height,
-      cells: this.cells
-    })
-  }
-
-  public static deserialize(data: string): Grid {
-    const parsed = JSON.parse(data)
-    const grid = new Grid(parsed.width, parsed.height)
-    grid.cells = parsed.cells
-    return grid
-  }
+  return true
 }
