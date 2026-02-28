@@ -38,14 +38,14 @@ describe('deriveFlows', () => {
         name: 'Steel Mill',
         size: { width: 4, height: 3 },
         inputs: [{ resource: Resource.Power, volume: 5 }],
-        outputs: [{ resource: Resource.Steel, volume: 8 }]
+        outputs: [{ resource: Resource.Iron, volume: 8 }]
       },
       {
         name: 'Alloy Foundry',
         size: { width: 4, height: 4 },
         inputs: [
           { resource: Resource.Power, volume: 4 },
-          { resource: Resource.Steel, volume: 6 }
+          { resource: Resource.Iron, volume: 6 }
         ],
         outputs: [{ resource: Resource.Alloy, volume: 5 }]
       },
@@ -67,11 +67,11 @@ describe('deriveFlows', () => {
     expect(powerFlows).toHaveLength(3)
     expect(powerFlows.every((f) => f.sourceIndex === 0)).toBe(true)
 
-    const steelFlow = flows.find((f) => f.resource === Resource.Steel)
-    expect(steelFlow).toEqual({
+    const ironFlow = flows.find((f) => f.resource === Resource.Iron)
+    expect(ironFlow).toEqual({
       sourceIndex: 1,
       targetIndex: 2,
-      resource: Resource.Steel,
+      resource: Resource.Iron,
       volume: 6
     })
 

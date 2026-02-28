@@ -1,8 +1,23 @@
 export enum Resource {
+  // Utility
   Power = 'Power',
-  Steel = 'Steel',
+
+  // Raw materials
+  Iron = 'Iron',
+  Carbon = 'Carbon',
+  Silicon = 'Silicon',
+  Hydrogen = 'Hydrogen',
+  Ice = 'Ice',
+
+  // Processed materials
   Alloy = 'Alloy',
-  Electronics = 'Electronics'
+  Polymer = 'Polymer',
+  Electronics = 'Electronics',
+
+  // Consumables
+  Food = 'Food',
+  Water = 'Water',
+  Waste = 'Waste',
 }
 
 export type Position = {

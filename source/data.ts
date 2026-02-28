@@ -12,7 +12,7 @@ export const STEEL_MILL: BuildingTemplate = {
   name: 'Steel Mill',
   size: { width: 4, height: 3 },
   inputs: [{ resource: Resource.Power, volume: 5 }],
-  outputs: [{ resource: Resource.Steel, volume: 8 }]
+  outputs: [{ resource: Resource.Iron, volume: 8 }]
 }
 
 export const ALLOY_FOUNDRY: BuildingTemplate = {
@@ -20,7 +20,7 @@ export const ALLOY_FOUNDRY: BuildingTemplate = {
   size: { width: 4, height: 4 },
   inputs: [
     { resource: Resource.Power, volume: 4 },
-    { resource: Resource.Steel, volume: 6 }
+    { resource: Resource.Iron, volume: 6 }
   ],
   outputs: [{ resource: Resource.Alloy, volume: 5 }]
 }
