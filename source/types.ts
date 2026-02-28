@@ -17,7 +17,7 @@ export enum Resource {
   // Consumables
   Food = 'Food',
   Water = 'Water',
-  Waste = 'Waste',
+  Waste = 'Waste'
 }
 
 export type Position = {
@@ -75,4 +75,9 @@ export type SAResult = {
   layout: Layout
   cost: number
   iterations: number
+}
+
+export type ProductionTarget = {
+  resource: Resource
+  volume: number
 }

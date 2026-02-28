@@ -1,4 +1,4 @@
-import type { BuildingTemplate, Problem, SAConfig } from '~/types.ts'
+import type { BuildingTemplate, Problem, ProductionTarget, SAConfig } from '~/types.ts'
 import { Resource } from '~/types.ts'
 
 export const POWER_PLANT: BuildingTemplate = {
@@ -40,6 +40,10 @@ export const SAMPLE_PROBLEM: Problem = {
   gridHeight: 20,
   buildings: [POWER_PLANT, STEEL_MILL, ALLOY_FOUNDRY, ELECTRONICS_FACTORY]
 }
+
+export const BUILDING_CATALOG: BuildingTemplate[] = [POWER_PLANT, STEEL_MILL, ALLOY_FOUNDRY, ELECTRONICS_FACTORY]
+
+export const SAMPLE_TARGETS: ProductionTarget[] = [{ resource: Resource.Electronics, volume: 3 }]
 
 export const DEFAULT_SA_CONFIG: SAConfig = {
   initialTemperature: 1000,

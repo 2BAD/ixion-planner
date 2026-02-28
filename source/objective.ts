@@ -12,25 +12,48 @@ export const manhattanDistance = (a: Position, b: Position): number => {
 }
 
 export const deriveFlows = (buildings: BuildingTemplate[]): Flow[] => {
+  const resources = new Set<Resource>()
+  for (const b of buildings) {
+    for (const o of b.outputs) {
+      resources.add(o.resource)
+    }
+    for (const i of b.inputs) {
+      resources.add(i.resource)
+    }
+  }
+
   const flows: Flow[] = []
 
-  for (let si = 0; si < buildings.length; si++) {
-    const source = buildings[si]
-    for (const output of source.outputs) {
-      for (let ti = 0; ti < buildings.length; ti++) {
-        if (si === ti) {
-          continue
+  for (const resource of resources) {
+    const suppliers: { index: number; volume: number }[] = []
+    const consumers: { index: number; volume: number }[] = []
+
+    for (let i = 0; i < buildings.length; i++) {
+      for (const o of buildings[i].outputs) {
+        if (o.resource === resource) {
+          suppliers.push({ index: i, volume: o.volume })
         }
-        const target = buildings[ti]
-        for (const input of target.inputs) {
-          if (input.resource === output.resource) {
-            flows.push({
-              sourceIndex: si,
-              targetIndex: ti,
-              resource: input.resource,
-              volume: Math.min(output.volume, input.volume)
-            })
-          }
+      }
+      for (const inp of buildings[i].inputs) {
+        if (inp.resource === resource) {
+          consumers.push({ index: i, volume: inp.volume })
+        }
+      }
+    }
+
+    if (suppliers.length === 0 || consumers.length === 0) {
+      continue
+    }
+
+    const totalSupply = suppliers.reduce((sum, s) => sum + s.volume, 0)
+    const totalDemand = consumers.reduce((sum, c) => sum + c.volume, 0)
+    const actualFlow = Math.min(totalSupply, totalDemand)
+
+    for (const s of suppliers) {
+      for (const c of consumers) {
+        const volume = actualFlow * (s.volume / totalSupply) * (c.volume / totalDemand)
+        if (volume > 0) {
+          flows.push({ sourceIndex: s.index, targetIndex: c.index, resource, volume })
         }
       }
     }

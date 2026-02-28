@@ -49,12 +49,19 @@
         "types": "./build/sa.d.ts",
         "default": "./build/sa.js"
       }
+    },
+    "./compose": {
+      "import": {
+        "types": "./build/compose.d.ts",
+        "default": "./build/compose.js"
+      }
     }
   },
   "files": [
     "build"
   ],
   "scripts": {
+    "start": "tsx source/solve.ts",
     "build": "tsdown",
     "check": "run-p check:**",
     "check:code": "oxlint ./source",

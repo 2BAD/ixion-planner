@@ -26,6 +26,28 @@ describe('manhattanDistance', () => {
 })
 
 describe('deriveFlows', () => {
+  it('should proportionally allocate flows with multiple suppliers and consumers', () => {
+    const buildings: BuildingTemplate[] = [
+      { name: 'S1', size: { width: 1, height: 1 }, inputs: [], outputs: [{ resource: Resource.Power, volume: 6 }] },
+      { name: 'S2', size: { width: 1, height: 1 }, inputs: [], outputs: [{ resource: Resource.Power, volume: 4 }] },
+      { name: 'C1', size: { width: 1, height: 1 }, inputs: [{ resource: Resource.Power, volume: 3 }], outputs: [] },
+      { name: 'C2', size: { width: 1, height: 1 }, inputs: [{ resource: Resource.Power, volume: 5 }], outputs: [] },
+      { name: 'C3', size: { width: 1, height: 1 }, inputs: [{ resource: Resource.Power, volume: 2 }], outputs: [] }
+    ]
+
+    const flows = deriveFlows(buildings)
+    expect(flows).toHaveLength(6) // 2 suppliers x 3 consumers
+
+    // totalSupply = 10, totalDemand = 10, actualFlow = 10
+    // Each flow = 10 * (supplier.volume / 10) * (consumer.volume / 10)
+    const totalVolume = flows.reduce((sum, f) => sum + f.volume, 0)
+    expect(totalVolume).toBe(10)
+
+    // S1 (volume 6) -> C2 (volume 5): 10 * (6/10) * (5/10) = 3
+    const s1c2 = flows.find((f) => f.sourceIndex === 0 && f.targetIndex === 3)
+    expect(s1c2?.volume).toBe(3)
+  })
+
   it('should derive 5 flows from the 4-building chain', () => {
     const buildings: BuildingTemplate[] = [
       {
