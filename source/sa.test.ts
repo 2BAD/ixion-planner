@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { validateLayout } from '~/grid.ts'
 import { computeCost, deriveFlows } from '~/objective.ts'
 import { randomLayout } from '~/perturbation.ts'
+import { routeFlows } from '~/routing.ts'
 import { solve } from '~/sa.ts'
 import type { Problem, SAConfig } from '~/types.ts'
 import { Resource } from '~/types.ts'
@@ -14,13 +15,18 @@ const problem: Problem = {
       name: 'Power Plant',
       size: { width: 3, height: 3 },
       inputs: [],
-      outputs: [{ resource: Resource.Power, volume: 10 }]
+      outputs: [{ resource: Resource.Power, volume: 10 }],
+      connections: [{ x: 1, y: 2 }]
     },
     {
       name: 'Steel Mill',
       size: { width: 4, height: 3 },
       inputs: [{ resource: Resource.Power, volume: 5 }],
-      outputs: [{ resource: Resource.Iron, volume: 8 }]
+      outputs: [{ resource: Resource.Iron, volume: 8 }],
+      connections: [
+        { x: 0, y: 1 },
+        { x: 3, y: 1 }
+      ]
     },
     {
       name: 'Alloy Foundry',
@@ -29,7 +35,11 @@ const problem: Problem = {
         { resource: Resource.Power, volume: 4 },
         { resource: Resource.Iron, volume: 6 }
       ],
-      outputs: [{ resource: Resource.Alloy, volume: 5 }]
+      outputs: [{ resource: Resource.Alloy, volume: 5 }],
+      connections: [
+        { x: 0, y: 2 },
+        { x: 3, y: 2 }
+      ]
     },
     {
       name: 'Electronics Factory',
@@ -38,7 +48,11 @@ const problem: Problem = {
         { resource: Resource.Power, volume: 3 },
         { resource: Resource.Alloy, volume: 4 }
       ],
-      outputs: [{ resource: Resource.Electronics, volume: 3 }]
+      outputs: [{ resource: Resource.Electronics, volume: 3 }],
+      connections: [
+        { x: 1, y: 0 },
+        { x: 1, y: 3 }
+      ]
     }
   ]
 }
@@ -47,7 +61,8 @@ const config: SAConfig = {
   initialTemperature: 500,
   coolingRate: 0.95,
   iterationsPerTemp: 20,
-  minTemperature: 1
+  minTemperature: 1,
+  roadWeight: 1
 }
 
 const seededRng = (seed: number): (() => number) => {
@@ -71,6 +86,12 @@ describe('solve', () => {
     expect(result.layout.placements).toHaveLength(problem.buildings.length)
   })
 
+  it('should include roads in the result', () => {
+    const result = solve(problem, config, seededRng(42))
+    expect(result.roads).toBeDefined()
+    expect(Array.isArray(result.roads)).toBe(true)
+  })
+
   it('should improve over average random layout cost', () => {
     const rng = seededRng(42)
     const flows = deriveFlows(problem.buildings)
@@ -78,7 +99,8 @@ describe('solve', () => {
     const randomCosts: number[] = []
     for (let i = 0; i < 10; i++) {
       const layout = randomLayout(problem, seededRng(i * 1000))
-      randomCosts.push(computeCost(layout, problem.buildings, flows))
+      const routing = routeFlows(layout, problem, flows)
+      randomCosts.push(computeCost(flows, routing.pathLengths, routing.roads.length, config.roadWeight))
     }
     const avgRandomCost = randomCosts.reduce((a, b) => a + b, 0) / randomCosts.length
 

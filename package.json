@@ -55,6 +55,18 @@
         "types": "./build/compose.d.ts",
         "default": "./build/compose.js"
       }
+    },
+    "./pathfinding": {
+      "import": {
+        "types": "./build/pathfinding.d.ts",
+        "default": "./build/pathfinding.js"
+      }
+    },
+    "./routing": {
+      "import": {
+        "types": "./build/routing.d.ts",
+        "default": "./build/routing.js"
+      }
     }
   },
   "files": [

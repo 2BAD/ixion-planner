@@ -1,13 +1,16 @@
 import { deriveFlows, computeCost } from '~/objective.ts'
 import { perturb, randomLayout } from '~/perturbation.ts'
+import { routeFlows } from '~/routing.ts'
 import type { Problem, SAConfig, SAResult } from '~/types.ts'
 
 export const solve = (problem: Problem, config: SAConfig, rng: () => number = Math.random): SAResult => {
   const flows = deriveFlows(problem.buildings)
   let current = randomLayout(problem, rng)
-  let currentCost = computeCost(current, problem.buildings, flows)
+  let currentRouting = routeFlows(current, problem, flows)
+  let currentCost = computeCost(flows, currentRouting.pathLengths, currentRouting.roads.length, config.roadWeight)
 
   let best = current
+  let bestRouting = currentRouting
   let bestCost = currentCost
 
   let temperature = config.initialTemperature
@@ -21,15 +24,23 @@ export const solve = (problem: Problem, config: SAConfig, rng: () => number = Ma
         continue
       }
 
-      const neighborCost = computeCost(neighbor, problem.buildings, flows)
+      const neighborRouting = routeFlows(neighbor, problem, flows)
+      const neighborCost = computeCost(
+        flows,
+        neighborRouting.pathLengths,
+        neighborRouting.roads.length,
+        config.roadWeight
+      )
       const delta = neighborCost - currentCost
 
       if (delta < 0 || rng() < Math.exp(-delta / temperature)) {
         current = neighbor
+        currentRouting = neighborRouting
         currentCost = neighborCost
 
         if (currentCost < bestCost) {
           best = current
+          bestRouting = currentRouting
           bestCost = currentCost
         }
       }
@@ -40,5 +51,5 @@ export const solve = (problem: Problem, config: SAConfig, rng: () => number = Ma
     temperature *= config.coolingRate
   }
 
-  return { layout: best, cost: bestCost, iterations }
+  return { layout: best, cost: bestCost, iterations, roads: bestRouting.roads }
 }

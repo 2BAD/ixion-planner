@@ -4,6 +4,7 @@ import { BUILDING_CATALOG, DEFAULT_SA_CONFIG, SAMPLE_PROBLEM, SAMPLE_TARGETS } f
 import { validateLayout } from '~/grid.ts'
 import { computeCost, deriveFlows } from '~/objective.ts'
 import { randomLayout } from '~/perturbation.ts'
+import { routeFlows } from '~/routing.ts'
 import { solve } from '~/sa.ts'
 import type { Problem } from '~/types.ts'
 
@@ -31,7 +32,13 @@ export const run = (): void => {
   const flows = deriveFlows(problem.buildings)
 
   const baseline = randomLayout(problem, Math.random)
-  const baselineCost = computeCost(baseline, problem.buildings, flows)
+  const baselineRouting = routeFlows(baseline, problem, flows)
+  const baselineCost = computeCost(
+    flows,
+    baselineRouting.pathLengths,
+    baselineRouting.roads.length,
+    DEFAULT_SA_CONFIG.roadWeight
+  )
 
   console.log('=== Placement Phase ===')
   console.log(`random baseline cost: ${baselineCost.toFixed(1)}`)
@@ -45,11 +52,17 @@ export const run = (): void => {
   console.log(`iterations: ${result.iterations}`)
   console.log(`valid: ${valid}`)
   console.log(`improvement over random: ${improvement.toFixed(1)}%`)
+  console.log(`road cells: ${result.roads.length}`)
   console.log()
 
   for (const placement of result.layout.placements) {
     const building = problem.buildings[placement.templateIndex]
     console.log(`${building.name}: (${placement.position.x}, ${placement.position.y})`)
+  }
+
+  if (result.roads.length > 0) {
+    console.log()
+    console.log(`roads: ${result.roads.map((r) => `(${r.x},${r.y})`).join(' ')}`)
   }
 }
 
