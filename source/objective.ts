@@ -1,4 +1,4 @@
-import type { BuildingTemplate, Flow, Layout, Position, Size } from '~/types.ts'
+import type { Flow, Position, Size } from '~/types.ts'
 
 export const centroid = (position: Position, size: Size): Position => {
   return {
@@ -62,15 +62,17 @@ export const deriveFlows = (buildings: BuildingTemplate[]): Flow[] => {
   return flows
 }
 
-export const computeCost = (layout: Layout, buildings: BuildingTemplate[], flows: Flow[]): number => {
-  let cost = 0
+export const UNROUTABLE_PENALTY = 10000
 
-  for (const flow of flows) {
-    const sourcePlacement = layout.placements[flow.sourceIndex]
-    const targetPlacement = layout.placements[flow.targetIndex]
-    const sourceCenter = centroid(sourcePlacement.position, buildings[sourcePlacement.templateIndex].size)
-    const targetCenter = centroid(targetPlacement.position, buildings[targetPlacement.templateIndex].size)
-    cost += flow.volume * manhattanDistance(sourceCenter, targetCenter)
+export const computeCost = (flows: Flow[], pathLengths: number[], roadCount: number, roadWeight: number): number => {
+  let cost = roadCount * roadWeight
+
+  for (let i = 0; i < flows.length; i++) {
+    if (pathLengths[i] < 0) {
+      cost += UNROUTABLE_PENALTY * flows[i].volume
+    } else {
+      cost += flows[i].volume * pathLengths[i]
+    }
   }
 
   return cost

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { centroid, computeCost, deriveFlows, manhattanDistance } from '~/objective.ts'
+import { centroid, computeCost, manhattanDistance, deriveFlows, UNROUTABLE_PENALTY } from '~/objective.ts'
 import { Resource } from '~/types.ts'
-import type { BuildingTemplate, Layout } from '~/types.ts'
+import type { BuildingTemplate } from '~/types.ts'
 
 describe('centroid', () => {
   it('should compute the center of a building', () => {
@@ -27,12 +27,43 @@ describe('manhattanDistance', () => {
 
 describe('deriveFlows', () => {
   it('should proportionally allocate flows with multiple suppliers and consumers', () => {
+    const c = [{ x: 0, y: 0 }]
     const buildings: BuildingTemplate[] = [
-      { name: 'S1', size: { width: 1, height: 1 }, inputs: [], outputs: [{ resource: Resource.Power, volume: 6 }] },
-      { name: 'S2', size: { width: 1, height: 1 }, inputs: [], outputs: [{ resource: Resource.Power, volume: 4 }] },
-      { name: 'C1', size: { width: 1, height: 1 }, inputs: [{ resource: Resource.Power, volume: 3 }], outputs: [] },
-      { name: 'C2', size: { width: 1, height: 1 }, inputs: [{ resource: Resource.Power, volume: 5 }], outputs: [] },
-      { name: 'C3', size: { width: 1, height: 1 }, inputs: [{ resource: Resource.Power, volume: 2 }], outputs: [] }
+      {
+        name: 'S1',
+        size: { width: 1, height: 1 },
+        inputs: [],
+        outputs: [{ resource: Resource.Power, volume: 6 }],
+        connections: c
+      },
+      {
+        name: 'S2',
+        size: { width: 1, height: 1 },
+        inputs: [],
+        outputs: [{ resource: Resource.Power, volume: 4 }],
+        connections: c
+      },
+      {
+        name: 'C1',
+        size: { width: 1, height: 1 },
+        inputs: [{ resource: Resource.Power, volume: 3 }],
+        outputs: [],
+        connections: c
+      },
+      {
+        name: 'C2',
+        size: { width: 1, height: 1 },
+        inputs: [{ resource: Resource.Power, volume: 5 }],
+        outputs: [],
+        connections: c
+      },
+      {
+        name: 'C3',
+        size: { width: 1, height: 1 },
+        inputs: [{ resource: Resource.Power, volume: 2 }],
+        outputs: [],
+        connections: c
+      }
     ]
 
     const flows = deriveFlows(buildings)
@@ -49,18 +80,21 @@ describe('deriveFlows', () => {
   })
 
   it('should derive 5 flows from the 4-building chain', () => {
+    const c = [{ x: 0, y: 0 }]
     const buildings: BuildingTemplate[] = [
       {
         name: 'Power Plant',
         size: { width: 3, height: 3 },
         inputs: [],
-        outputs: [{ resource: Resource.Power, volume: 10 }]
+        outputs: [{ resource: Resource.Power, volume: 10 }],
+        connections: c
       },
       {
         name: 'Steel Mill',
         size: { width: 4, height: 3 },
         inputs: [{ resource: Resource.Power, volume: 5 }],
-        outputs: [{ resource: Resource.Iron, volume: 8 }]
+        outputs: [{ resource: Resource.Iron, volume: 8 }],
+        connections: c
       },
       {
         name: 'Alloy Foundry',
@@ -69,7 +103,8 @@ describe('deriveFlows', () => {
           { resource: Resource.Power, volume: 4 },
           { resource: Resource.Iron, volume: 6 }
         ],
-        outputs: [{ resource: Resource.Alloy, volume: 5 }]
+        outputs: [{ resource: Resource.Alloy, volume: 5 }],
+        connections: c
       },
       {
         name: 'Electronics Factory',
@@ -78,7 +113,8 @@ describe('deriveFlows', () => {
           { resource: Resource.Power, volume: 3 },
           { resource: Resource.Alloy, volume: 4 }
         ],
-        outputs: [{ resource: Resource.Electronics, volume: 3 }]
+        outputs: [{ resource: Resource.Electronics, volume: 3 }],
+        connections: c
       }
     ]
 
@@ -108,21 +144,79 @@ describe('deriveFlows', () => {
 })
 
 describe('computeCost', () => {
-  it('should compute weighted manhattan distance cost', () => {
+  it('should compute cost from path lengths and road count', () => {
+    const c = [{ x: 0, y: 0 }]
     const buildings: BuildingTemplate[] = [
-      { name: 'A', size: { width: 2, height: 2 }, inputs: [], outputs: [{ resource: Resource.Power, volume: 10 }] },
-      { name: 'B', size: { width: 2, height: 2 }, inputs: [{ resource: Resource.Power, volume: 5 }], outputs: [] }
+      {
+        name: 'A',
+        size: { width: 2, height: 2 },
+        inputs: [],
+        outputs: [{ resource: Resource.Power, volume: 10 }],
+        connections: c
+      },
+      {
+        name: 'B',
+        size: { width: 2, height: 2 },
+        inputs: [{ resource: Resource.Power, volume: 5 }],
+        outputs: [],
+        connections: c
+      }
     ]
     const flows = deriveFlows(buildings)
-    const layout: Layout = {
-      placements: [
-        { templateIndex: 0, position: { x: 0, y: 0 } },
-        { templateIndex: 1, position: { x: 4, y: 0 } }
-      ]
-    }
 
-    // centroid A = (1, 1), centroid B = (5, 1), distance = 4, volume = 5
-    const cost = computeCost(layout, buildings, flows)
-    expect(cost).toBe(20)
+    // 1 flow with volume 5, path length 4, 4 road cells, roadWeight 1
+    const cost = computeCost(flows, [4], 4, 1)
+    // cost = 4 * 1 + 5 * 4 = 24
+    expect(cost).toBe(24)
+  })
+
+  it('should apply penalty for unroutable flows', () => {
+    const c = [{ x: 0, y: 0 }]
+    const buildings: BuildingTemplate[] = [
+      {
+        name: 'A',
+        size: { width: 1, height: 1 },
+        inputs: [],
+        outputs: [{ resource: Resource.Power, volume: 10 }],
+        connections: c
+      },
+      {
+        name: 'B',
+        size: { width: 1, height: 1 },
+        inputs: [{ resource: Resource.Power, volume: 5 }],
+        outputs: [],
+        connections: c
+      }
+    ]
+    const flows = deriveFlows(buildings)
+
+    const cost = computeCost(flows, [-1], 0, 1)
+    expect(cost).toBe(UNROUTABLE_PENALTY * 5)
+  })
+
+  it('should weight road cells by roadWeight', () => {
+    const c = [{ x: 0, y: 0 }]
+    const buildings: BuildingTemplate[] = [
+      {
+        name: 'A',
+        size: { width: 1, height: 1 },
+        inputs: [],
+        outputs: [{ resource: Resource.Power, volume: 10 }],
+        connections: c
+      },
+      {
+        name: 'B',
+        size: { width: 1, height: 1 },
+        inputs: [{ resource: Resource.Power, volume: 5 }],
+        outputs: [],
+        connections: c
+      }
+    ]
+    const flows = deriveFlows(buildings)
+
+    // path length 3, 3 road cells, roadWeight 5
+    const cost = computeCost(flows, [3], 3, 5)
+    // cost = 3 * 5 + 5 * 3 = 30
+    expect(cost).toBe(30)
   })
 })
