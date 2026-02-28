@@ -88,8 +88,8 @@ describe('isAreaFreeExcluding', () => {
 describe('buildOccupancyGrid', () => {
   it('should mark all placements on the grid', () => {
     const buildings = [
-      { name: 'A', size: { width: 2, height: 2 }, inputs: [], outputs: [] },
-      { name: 'B', size: { width: 1, height: 1 }, inputs: [], outputs: [] }
+      { name: 'A', size: { width: 2, height: 2 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] },
+      { name: 'B', size: { width: 1, height: 1 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
     ]
     const placements = [
       { templateIndex: 0, position: { x: 0, y: 0 } },
@@ -109,8 +109,8 @@ describe('buildOccupancyGrid', () => {
 describe('validateLayout', () => {
   it('should return true for a valid non-overlapping layout', () => {
     const buildings = [
-      { name: 'A', size: { width: 2, height: 2 }, inputs: [], outputs: [] },
-      { name: 'B', size: { width: 2, height: 2 }, inputs: [], outputs: [] }
+      { name: 'A', size: { width: 2, height: 2 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] },
+      { name: 'B', size: { width: 2, height: 2 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
     ]
     const placements = [
       { templateIndex: 0, position: { x: 0, y: 0 } },
@@ -121,8 +121,8 @@ describe('validateLayout', () => {
 
   it('should return false for overlapping buildings', () => {
     const buildings = [
-      { name: 'A', size: { width: 2, height: 2 }, inputs: [], outputs: [] },
-      { name: 'B', size: { width: 2, height: 2 }, inputs: [], outputs: [] }
+      { name: 'A', size: { width: 2, height: 2 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] },
+      { name: 'B', size: { width: 2, height: 2 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
     ]
     const placements = [
       { templateIndex: 0, position: { x: 0, y: 0 } },
@@ -132,7 +132,9 @@ describe('validateLayout', () => {
   })
 
   it('should return false for out-of-bounds placement', () => {
-    const buildings = [{ name: 'A', size: { width: 3, height: 3 }, inputs: [], outputs: [] }]
+    const buildings = [
+      { name: 'A', size: { width: 3, height: 3 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
+    ]
     const placements = [{ templateIndex: 0, position: { x: 8, y: 8 } }]
     expect(validateLayout(10, 10, placements, buildings)).toBe(false)
   })

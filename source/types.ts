@@ -40,6 +40,7 @@ export type BuildingTemplate = {
   size: Size
   inputs: ResourceFlow[]
   outputs: ResourceFlow[]
+  connections: Position[]
 }
 
 export type Placement = {
@@ -69,12 +70,14 @@ export type SAConfig = {
   coolingRate: number
   iterationsPerTemp: number
   minTemperature: number
+  roadWeight: number
 }
 
 export type SAResult = {
   layout: Layout
   cost: number
   iterations: number
+  roads: Position[]
 }
 
 export type ProductionTarget = {

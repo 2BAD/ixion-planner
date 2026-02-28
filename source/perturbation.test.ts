@@ -17,13 +17,18 @@ const problem: Problem = {
       name: 'Power Plant',
       size: { width: 3, height: 3 },
       inputs: [],
-      outputs: [{ resource: Resource.Power, volume: 10 }]
+      outputs: [{ resource: Resource.Power, volume: 10 }],
+      connections: [{ x: 1, y: 2 }]
     },
     {
       name: 'Steel Mill',
       size: { width: 4, height: 3 },
       inputs: [{ resource: Resource.Power, volume: 5 }],
-      outputs: [{ resource: Resource.Iron, volume: 8 }]
+      outputs: [{ resource: Resource.Iron, volume: 8 }],
+      connections: [
+        { x: 0, y: 1 },
+        { x: 3, y: 1 }
+      ]
     },
     {
       name: 'Alloy Foundry',
@@ -32,7 +37,11 @@ const problem: Problem = {
         { resource: Resource.Power, volume: 4 },
         { resource: Resource.Iron, volume: 6 }
       ],
-      outputs: [{ resource: Resource.Alloy, volume: 5 }]
+      outputs: [{ resource: Resource.Alloy, volume: 5 }],
+      connections: [
+        { x: 0, y: 2 },
+        { x: 3, y: 2 }
+      ]
     },
     {
       name: 'Electronics Factory',
@@ -41,7 +50,11 @@ const problem: Problem = {
         { resource: Resource.Power, volume: 3 },
         { resource: Resource.Alloy, volume: 4 }
       ],
-      outputs: [{ resource: Resource.Electronics, volume: 3 }]
+      outputs: [{ resource: Resource.Electronics, volume: 3 }],
+      connections: [
+        { x: 1, y: 0 },
+        { x: 1, y: 3 }
+      ]
     }
   ]
 }
