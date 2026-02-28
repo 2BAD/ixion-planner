@@ -1,5 +1,6 @@
 import { buildOccupancyGrid } from '~/grid.ts'
-import { bfs } from '~/pathfinding.ts'
+import { bfsMulti, createBfsBuffers } from '~/pathfinding.ts'
+import type { BfsBuffers } from '~/pathfinding.ts'
 import type { Flow, Layout, Position, Problem } from '~/types.ts'
 
 export type RoutingResult = {
@@ -7,8 +8,9 @@ export type RoutingResult = {
   pathLengths: number[]
 }
 
-export const routeFlows = (layout: Layout, problem: Problem, flows: Flow[]): RoutingResult => {
+export const routeFlows = (layout: Layout, problem: Problem, flows: Flow[], buffers?: BfsBuffers): RoutingResult => {
   const grid = buildOccupancyGrid(problem.gridWidth, problem.gridHeight, layout.placements, problem.buildings)
+  const buf = buffers ?? createBfsBuffers(problem.gridWidth, problem.gridHeight)
   const roadSet = new Set<number>()
   const pathLengths: number[] = []
 
@@ -27,24 +29,13 @@ export const routeFlows = (layout: Layout, problem: Problem, flows: Flow[]): Rou
       y: targetPlacement.position.y + c.y
     }))
 
-    let bestPath: Position[] | null = null
-    let bestLength = Infinity
+    const path = bfsMulti(grid, problem.gridWidth, problem.gridHeight, sourceConnections, targetConnections, buf)
 
-    for (const src of sourceConnections) {
-      for (const tgt of targetConnections) {
-        const path = bfs(grid, problem.gridWidth, problem.gridHeight, src, tgt)
-        if (path !== null && path.length < bestLength) {
-          bestPath = path
-          bestLength = path.length
-        }
-      }
-    }
-
-    if (bestPath === null) {
+    if (path === null) {
       pathLengths.push(-1)
     } else {
-      pathLengths.push(bestPath.length)
-      for (const cell of bestPath) {
+      pathLengths.push(path.length)
+      for (const cell of path) {
         roadSet.add(cell.y * problem.gridWidth + cell.x)
       }
     }

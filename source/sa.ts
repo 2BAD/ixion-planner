@@ -1,12 +1,14 @@
 import { deriveFlows, computeCost } from '~/objective.ts'
+import { createBfsBuffers } from '~/pathfinding.ts'
 import { perturb, randomLayout } from '~/perturbation.ts'
 import { routeFlows } from '~/routing.ts'
 import type { Problem, SAConfig, SAResult } from '~/types.ts'
 
 export const solve = (problem: Problem, config: SAConfig, rng: () => number = Math.random): SAResult => {
   const flows = deriveFlows(problem.buildings)
+  const buffers = createBfsBuffers(problem.gridWidth, problem.gridHeight)
   let current = randomLayout(problem, rng)
-  let currentRouting = routeFlows(current, problem, flows)
+  let currentRouting = routeFlows(current, problem, flows, buffers)
   let currentCost = computeCost(flows, currentRouting.pathLengths, currentRouting.roads.length, config.roadWeight)
 
   let best = current
@@ -24,7 +26,7 @@ export const solve = (problem: Problem, config: SAConfig, rng: () => number = Ma
         continue
       }
 
-      const neighborRouting = routeFlows(neighbor, problem, flows)
+      const neighborRouting = routeFlows(neighbor, problem, flows, buffers)
       const neighborCost = computeCost(
         flows,
         neighborRouting.pathLengths,
