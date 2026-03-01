@@ -4,6 +4,7 @@ import { BUILDING_CATALOG, DEFAULT_SA_CONFIG, SAMPLE_PROBLEM, SAMPLE_TARGETS } f
 import { validateLayout } from '~/grid.ts'
 import { computeCost, deriveFlows } from '~/objective.ts'
 import { randomLayout } from '~/perturbation.ts'
+import { renderGrid } from '~/render.ts'
 import { routeFlows } from '~/routing.ts'
 import { solve } from '~/sa.ts'
 import type { Problem } from '~/types.ts'
@@ -64,6 +65,9 @@ export const run = (): void => {
     console.log()
     console.log(`roads: ${result.roads.map((r) => `(${r.x},${r.y})`).join(' ')}`)
   }
+
+  console.log()
+  console.log(renderGrid(result, problem))
 }
 
 run()

@@ -67,6 +67,12 @@
         "types": "./build/routing.d.ts",
         "default": "./build/routing.js"
       }
+    },
+    "./render": {
+      "import": {
+        "types": "./build/render.d.ts",
+        "default": "./build/render.js"
+      }
     }
   },
   "files": [
