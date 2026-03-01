@@ -1,6 +1,7 @@
 import { buildOccupancyGrid } from '~/grid.ts'
 import { bfsMulti, createBfsBuffers } from '~/pathfinding.ts'
 import type { BfsBuffers } from '~/pathfinding.ts'
+import { rotateConnections } from '~/rotation.ts'
 import type { Flow, Layout, Position, Problem } from '~/types.ts'
 
 export type RoutingResult = {
@@ -20,11 +21,22 @@ export const routeFlows = (layout: Layout, problem: Problem, flows: Flow[], buff
     const sourceBuilding = problem.buildings[sourcePlacement.templateIndex]
     const targetBuilding = problem.buildings[targetPlacement.templateIndex]
 
-    const sourceConnections = sourceBuilding.connections.map((c) => ({
+    const rotatedSource = rotateConnections(
+      sourceBuilding.connections,
+      sourceBuilding.size,
+      sourcePlacement.orientation
+    )
+    const rotatedTarget = rotateConnections(
+      targetBuilding.connections,
+      targetBuilding.size,
+      targetPlacement.orientation
+    )
+
+    const sourceConnections = rotatedSource.map((c) => ({
       x: sourcePlacement.position.x + c.x,
       y: sourcePlacement.position.y + c.y
     }))
-    const targetConnections = targetBuilding.connections.map((c) => ({
+    const targetConnections = rotatedTarget.map((c) => ({
       x: targetPlacement.position.x + c.x,
       y: targetPlacement.position.y + c.y
     }))

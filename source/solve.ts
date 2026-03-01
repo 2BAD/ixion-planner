@@ -58,7 +58,8 @@ export const run = (): void => {
 
   for (const placement of result.layout.placements) {
     const building = problem.buildings[placement.templateIndex]
-    console.log(`${building.name}: (${placement.position.x}, ${placement.position.y})`)
+    const orientationLabel = ['0°', '90°', '180°', '270°'][placement.orientation]
+    console.log(`${building.name}: (${placement.position.x}, ${placement.position.y}) ${orientationLabel}`)
   }
 
   if (result.roads.length > 0) {

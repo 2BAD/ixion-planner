@@ -1,4 +1,5 @@
 import { buildOccupancyGrid } from '~/grid.ts'
+import { rotateConnections, rotateSize } from '~/rotation.ts'
 import type { Problem, SAResult } from '~/types.ts'
 
 export const renderGrid = (result: SAResult, problem: Problem): string => {
@@ -15,8 +16,9 @@ export const renderGrid = (result: SAResult, problem: Problem): string => {
     const letter = String.fromCharCode(65 + (i % 26))
     const placement = placements[i]
     const building = buildings[placement.templateIndex]
-    for (let dy = 0; dy < building.size.height; dy++) {
-      for (let dx = 0; dx < building.size.width; dx++) {
+    const effectiveSize = rotateSize(building.size, placement.orientation)
+    for (let dy = 0; dy < effectiveSize.height; dy++) {
+      for (let dx = 0; dx < effectiveSize.width; dx++) {
         chars[(placement.position.y + dy) * gridWidth + (placement.position.x + dx)] = letter
       }
     }
@@ -33,7 +35,8 @@ export const renderGrid = (result: SAResult, problem: Problem): string => {
   // Mark connection points (overrides roads if overlapping)
   for (const placement of placements) {
     const building = buildings[placement.templateIndex]
-    for (const conn of building.connections) {
+    const rotatedConns = rotateConnections(building.connections, building.size, placement.orientation)
+    for (const conn of rotatedConns) {
       const cx = placement.position.x + conn.x
       const cy = placement.position.y + conn.y
       if (cx >= 0 && cx < gridWidth && cy >= 0 && cy < gridHeight) {
@@ -77,8 +80,10 @@ export const renderGrid = (result: SAResult, problem: Problem): string => {
   lines.push('Legend:')
   for (let i = 0; i < placements.length; i++) {
     const letter = String.fromCharCode(65 + (i % 26))
-    const building = buildings[placements[i].templateIndex]
-    lines.push(`  ${letter}  ${building.name} (${building.size.width}x${building.size.height})`)
+    const placement = placements[i]
+    const building = buildings[placement.templateIndex]
+    const effectiveSize = rotateSize(building.size, placement.orientation)
+    lines.push(`  ${letter}  ${building.name} (${effectiveSize.width}x${effectiveSize.height})`)
   }
 
   return lines.join('\n')

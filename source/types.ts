@@ -30,6 +30,8 @@ export type Size = {
   height: number
 }
 
+export type Orientation = 0 | 1 | 2 | 3
+
 export type ResourceFlow = {
   resource: Resource
   volume: number
@@ -46,6 +48,7 @@ export type BuildingTemplate = {
 export type Placement = {
   templateIndex: number
   position: Position
+  orientation: Orientation
 }
 
 export type Layout = {

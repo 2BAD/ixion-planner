@@ -49,8 +49,8 @@ export const ELECTRONICS_FACTORY: BuildingTemplate = {
 }
 
 export const SAMPLE_PROBLEM: Problem = {
-  gridWidth: 20,
-  gridHeight: 20,
+  gridWidth: 56,
+  gridHeight: 30,
   buildings: [POWER_PLANT, STEEL_MILL, ALLOY_FOUNDRY, ELECTRONICS_FACTORY]
 }
 

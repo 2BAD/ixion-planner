@@ -25,8 +25,8 @@ describe('renderGrid', () => {
     const result: SAResult = {
       layout: {
         placements: [
-          { templateIndex: 0, position: { x: 1, y: 1 } },
-          { templateIndex: 1, position: { x: 6, y: 1 } }
+          { templateIndex: 0, position: { x: 1, y: 1 }, orientation: 0 },
+          { templateIndex: 1, position: { x: 6, y: 1 }, orientation: 0 }
         ]
       },
       cost: 100,
@@ -54,9 +54,9 @@ describe('renderGrid', () => {
     const result: SAResult = {
       layout: {
         placements: [
-          { templateIndex: 0, position: { x: 0, y: 0 } },
-          { templateIndex: 1, position: { x: 4, y: 0 } },
-          { templateIndex: 2, position: { x: 0, y: 4 } }
+          { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+          { templateIndex: 1, position: { x: 4, y: 0 }, orientation: 0 },
+          { templateIndex: 2, position: { x: 0, y: 4 }, orientation: 0 }
         ]
       },
       cost: 50,
@@ -75,7 +75,7 @@ describe('renderGrid', () => {
     const problem: Problem = { gridWidth: 8, gridHeight: 5, buildings }
     const result: SAResult = {
       layout: {
-        placements: [{ templateIndex: 0, position: { x: 0, y: 1 } }]
+        placements: [{ templateIndex: 0, position: { x: 0, y: 1 }, orientation: 0 }]
       },
       cost: 10,
       iterations: 5,
@@ -103,8 +103,8 @@ describe('renderGrid', () => {
     const result: SAResult = {
       layout: {
         placements: [
-          { templateIndex: 0, position: { x: 0, y: 0 } },
-          { templateIndex: 1, position: { x: 4, y: 3 } }
+          { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+          { templateIndex: 1, position: { x: 4, y: 3 }, orientation: 0 }
         ]
       },
       cost: 10,

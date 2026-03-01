@@ -73,6 +73,12 @@
         "types": "./build/render.d.ts",
         "default": "./build/render.js"
       }
+    },
+    "./rotation": {
+      "import": {
+        "types": "./build/rotation.d.ts",
+        "default": "./build/rotation.js"
+      }
     }
   },
   "files": [

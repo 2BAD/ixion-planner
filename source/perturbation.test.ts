@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { validateLayout } from '~/grid.ts'
-import { moveBuilding, perturb, randomLayout, swapBuildings } from '~/perturbation.ts'
+import { moveBuilding, perturb, randomLayout, rotateBuilding, swapBuildings } from '~/perturbation.ts'
 import type { Layout, Problem } from '~/types.ts'
 import { Resource } from '~/types.ts'
 
@@ -111,6 +111,28 @@ describe('swapBuildings', () => {
 
     const result = assertLayout(swapped)
     expect(validateLayout(problem.gridWidth, problem.gridHeight, result.placements, problem.buildings)).toBe(true)
+  })
+})
+
+describe('rotateBuilding', () => {
+  it('should produce a valid layout with a different orientation', () => {
+    const rng = seededRng(42)
+    const layout = randomLayout(problem, rng)
+
+    let rotated: ReturnType<typeof rotateBuilding> = null
+    for (let i = 0; i < 20; i++) {
+      rotated = rotateBuilding(layout, problem, seededRng(i))
+      if (rotated !== null) {
+        break
+      }
+    }
+
+    const result = assertLayout(rotated)
+    expect(validateLayout(problem.gridWidth, problem.gridHeight, result.placements, problem.buildings)).toBe(true)
+
+    // At least one placement should have a different orientation
+    const changed = result.placements.some((p, i) => p.orientation !== layout.placements[i].orientation)
+    expect(changed).toBe(true)
   })
 })
 

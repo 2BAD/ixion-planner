@@ -92,8 +92,8 @@ describe('buildOccupancyGrid', () => {
       { name: 'B', size: { width: 1, height: 1 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
     ]
     const placements = [
-      { templateIndex: 0, position: { x: 0, y: 0 } },
-      { templateIndex: 1, position: { x: 3, y: 3 } }
+      { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+      { templateIndex: 1, position: { x: 3, y: 3 }, orientation: 0 }
     ]
     const grid = buildOccupancyGrid(5, 5, placements, buildings)
 
@@ -113,8 +113,8 @@ describe('validateLayout', () => {
       { name: 'B', size: { width: 2, height: 2 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
     ]
     const placements = [
-      { templateIndex: 0, position: { x: 0, y: 0 } },
-      { templateIndex: 1, position: { x: 3, y: 0 } }
+      { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+      { templateIndex: 1, position: { x: 3, y: 0 }, orientation: 0 }
     ]
     expect(validateLayout(5, 5, placements, buildings)).toBe(true)
   })
@@ -125,8 +125,8 @@ describe('validateLayout', () => {
       { name: 'B', size: { width: 2, height: 2 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
     ]
     const placements = [
-      { templateIndex: 0, position: { x: 0, y: 0 } },
-      { templateIndex: 1, position: { x: 1, y: 1 } }
+      { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+      { templateIndex: 1, position: { x: 1, y: 1 }, orientation: 0 }
     ]
     expect(validateLayout(5, 5, placements, buildings)).toBe(false)
   })
@@ -135,7 +135,7 @@ describe('validateLayout', () => {
     const buildings = [
       { name: 'A', size: { width: 3, height: 3 }, inputs: [], outputs: [], connections: [{ x: 0, y: 0 }] }
     ]
-    const placements = [{ templateIndex: 0, position: { x: 8, y: 8 } }]
+    const placements = [{ templateIndex: 0, position: { x: 8, y: 8 }, orientation: 0 }]
     expect(validateLayout(10, 10, placements, buildings)).toBe(false)
   })
 })

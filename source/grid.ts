@@ -1,3 +1,4 @@
+import { rotateSize } from '~/rotation.ts'
 import type { BuildingTemplate, Layout, Position, Size } from '~/types.ts'
 
 export const createOccupancyGrid = (width: number, height: number): Uint8Array => {
@@ -71,7 +72,8 @@ export const buildOccupancyGrid = (
   for (let i = 0; i < placements.length; i++) {
     const placement = placements[i]
     const building = buildings[placement.templateIndex]
-    markBuilding(grid, gridWidth, placement.position, building.size, i + 1)
+    const effectiveSize = rotateSize(building.size, placement.orientation)
+    markBuilding(grid, gridWidth, placement.position, effectiveSize, i + 1)
   }
   return grid
 }
@@ -87,16 +89,17 @@ export const validateLayout = (
   for (let i = 0; i < placements.length; i++) {
     const placement = placements[i]
     const building = buildings[placement.templateIndex]
+    const effectiveSize = rotateSize(building.size, placement.orientation)
 
-    if (!isWithinBounds(placement.position, building.size, gridWidth, gridHeight)) {
+    if (!isWithinBounds(placement.position, effectiveSize, gridWidth, gridHeight)) {
       return false
     }
 
-    if (!isAreaFree(grid, gridWidth, placement.position, building.size)) {
+    if (!isAreaFree(grid, gridWidth, placement.position, effectiveSize)) {
       return false
     }
 
-    markBuilding(grid, gridWidth, placement.position, building.size, i + 1)
+    markBuilding(grid, gridWidth, placement.position, effectiveSize, i + 1)
   }
 
   return true

@@ -26,8 +26,8 @@ describe('routeFlows', () => {
     const problem: Problem = { gridWidth: 6, gridHeight: 1, buildings }
     const layout: Layout = {
       placements: [
-        { templateIndex: 0, position: { x: 0, y: 0 } },
-        { templateIndex: 1, position: { x: 4, y: 0 } }
+        { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+        { templateIndex: 1, position: { x: 4, y: 0 }, orientation: 0 }
       ]
     }
     const flows = deriveFlows(buildings)
@@ -70,8 +70,8 @@ describe('routeFlows', () => {
     const problem: Problem = { gridWidth: 8, gridHeight: 1, buildings }
     const layout: Layout = {
       placements: [
-        { templateIndex: 0, position: { x: 0, y: 0 } },
-        { templateIndex: 1, position: { x: 6, y: 0 } }
+        { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+        { templateIndex: 1, position: { x: 6, y: 0 }, orientation: 0 }
       ]
     }
     const flows = deriveFlows(buildings)
@@ -108,8 +108,8 @@ describe('routeFlows', () => {
     const problem: Problem = { gridWidth: 4, gridHeight: 1, buildings }
     const layout: Layout = {
       placements: [
-        { templateIndex: 0, position: { x: 0, y: 0 } },
-        { templateIndex: 1, position: { x: 3, y: 0 } }
+        { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+        { templateIndex: 1, position: { x: 3, y: 0 }, orientation: 0 }
       ]
     }
     const flows = deriveFlows(buildings)
@@ -151,9 +151,9 @@ describe('routeFlows', () => {
     const problem: Problem = { gridWidth: 3, gridHeight: 1, buildings }
     const layout: Layout = {
       placements: [
-        { templateIndex: 0, position: { x: 0, y: 0 } },
-        { templateIndex: 1, position: { x: 1, y: 0 } },
-        { templateIndex: 2, position: { x: 2, y: 0 } }
+        { templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 },
+        { templateIndex: 1, position: { x: 1, y: 0 }, orientation: 0 },
+        { templateIndex: 2, position: { x: 2, y: 0 }, orientation: 0 }
       ]
     }
     const flows: Flow[] = [{ sourceIndex: 0, targetIndex: 2, resource: Resource.Power, volume: 5 }]
@@ -175,7 +175,7 @@ describe('routeFlows', () => {
     ]
     const problem: Problem = { gridWidth: 5, gridHeight: 5, buildings }
     const layout: Layout = {
-      placements: [{ templateIndex: 0, position: { x: 0, y: 0 } }]
+      placements: [{ templateIndex: 0, position: { x: 0, y: 0 }, orientation: 0 }]
     }
     const result = routeFlows(layout, problem, [])
 
