@@ -97,7 +97,7 @@
     "preversion": "run-s check test build",
     "test": "vitest run",
     "test:integration": "vitest run integration --coverage",
-    "test:unit": "vitest run unit --coverage"
+    "test:unit": "vitest run --coverage"
   },
   "devDependencies": {
     "@2bad/tsconfig": "3.0.2",

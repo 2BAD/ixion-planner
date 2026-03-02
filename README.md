@@ -1,81 +1,39 @@
-# TypeScript Library Starter
+# ixion-planner
 
-A modern, zero-config template for building high-quality TypeScript libraries. Built with ESM-first architecture and powered by SWC for blazing-fast compilation, this starter kit provides everything you need to create, test, and publish professional TypeScript packages.
+A TypeScript library that solves a Facility Location Problem using Simulated Annealing. It optimizes spatial placement of game buildings on a 2D grid and routes roads between building connection points to minimize transport costs.
 
-## ✨ Key Features
+## How it works
 
-- **⚡️ Lightning-Fast Build Pipeline**
-  - SWC-powered compilation for rapid development cycles
-  - Optimized TypeScript configuration with path aliases
-  - Streamlined build process with parallel execution
+The solver runs in two phases:
 
-- **🔍 Comprehensive Quality Tools**
-  - Biome for fast, consistent code formatting and linting
-  - Extensive ESLint configuration for code quality (powered by [axiom](https://github.com/2BAD/axiom))
-  - Integrated test runner with coverage reporting
+1. **Compose** - backward-chains from production targets to determine the minimum set of buildings needed
+2. **Place** - uses simulated annealing to find optimal building positions on the grid, with BFS-routed roads between connection points
 
-- **📦 Modern Package Development**
-  - ESM-first architecture
-  - Automatic type declaration generation
-  - Properly configured package exports
-  - GitHub Actions workflow ready
+The cost function minimizes `BFS path length x resource flow volume + road cell count`.
 
-- **🛠 Developer Experience**
-  - Zero configuration needed to get started
-  - Type-safe development with strict TypeScript settings
-  - Hot-reloading test environment with Vitest
-  - Automated version management and publishing
+## Usage
 
-## Getting Started
+```ts
+import { compose } from 'ixion-planner/compose'
+import { solve } from 'ixion-planner/sa'
 
-1. Click "Use this template" on GitHub
-2. Clone your new repository
-3. Search and replace the following:
-   - `ts-lib-starter` → your package name
-   - `2BAD` → your name/organization (except `@2bad/tsconfig` references)
-4. Run `npm install`
-5. Start developing!
+const buildings = compose(catalog, targets)
+const result = solve({ gridWidth: 30, gridHeight: 30, buildings }, config)
+```
 
-## Available Scripts
+## Development
 
 ```bash
-# Development
-npm run test        # Run all tests
-npm run test:unit   # Run unit tests with coverage
-npm run build       # Build the library
-npm run check       # Run all code quality checks
-
-# Maintenance
-npm run fix         # Auto-fix all code style issues
-npm run fix:format  # or just the format code with Biome
+pnpm start              # run demo solver
+pnpm build              # compile to build/
+pnpm test               # run all tests
+pnpm test:unit          # unit tests with coverage
+pnpm check              # lint + format check
+pnpm fix                # auto-fix lint + format issues
 ```
 
-## Package Structure
-
-```
-├── source/         # Source code
-├── tests/          # Test files
-├── build/          # Compiled output (generated)
-└── package.json    # Package configuration
-```
-
-## Why Use This Template?
-
-- **Performance First**: SWC compilation is significantly faster than traditional TypeScript compilation
-- **Modern Standards**: Built with current best practices and modern JavaScript features
-- **Quality Focused**: Comprehensive testing and linting setup ensures high-quality code
-- **Production Ready**: Includes all necessary configurations for building and publishing packages
-- **Actively Maintained**: Regular updates to dependencies and features
-
-## Requirements
-
-- Node.js >= 20
-- npm >= 10.8.3
+Requires Node >= 24 and pnpm.
 
 ## License
 
-MIT © 2BAD
-
----
-
-This template is part of the [@2bad](https://github.com/2BAD) ecosystem of development tools.
+MIT
